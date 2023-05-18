@@ -1,0 +1,103 @@
+---
+title: "ESM 204 Homework 3"
+author: "Justine Lang"
+date: "2023-05-18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(janitor)
+library(here)
+library(broom)
+library(car)
+library(pracma)
+```
+
+```{r}
+### Read in data
+
+
+```
+
+
+## Question 1
+
+The data set HW3 data.csv provides price (in $) and quantity (in number of EVs) estimates
+of demand per year for both DAC and non-DAC groups. Run linear regressions (with an
+intercept) to estimate the demand curves for DAC and non-DAC consumers. What are 2-3
+reasons you can think that may explain the differences in demand you estimate?
+
+
+
+
+
+
+
+
+
+
+### Notes
+
+Slope = 50,000/Q_agg(50,000)
+
+P = 0 + 50,000/Q_agg(50,000)
+
+Don't worry about the kink in the agg curve. Just use triangle formula. Write function. Use demand function to calculate base of the triangle. 
+
+Producer surplus simpler. 
+
+Total environmental damage = externality per car x total cars. 
+
+EV tax: the MEC at Qso; in this case, tax just equals MEC
+
+Equate new supply curve (MSC) to aggregate demand curve. P = mQ + t; Q = P-t/m -> supply(p,t); Q should = Qagg. Use uniroot to find Pt*. Plug Pstar back into equation to find Qstar. 
+
+Would work to find Pstar or Qstar first, but might be best to find Pstar first. 
+
+Assume the mining externality is borne entirely by the DAC group. 
+
+Health cost = Qagg(Pt) x MEC
+
+The results should indicate that the tax doesn't do much for the disadvantaged group. 
+
+See tax on sellers graph. 
+
+stargazer
+
+Tax revenue = Qstar x t(MEC); calculate the redistribution four different times.
+
+Just answer question 7 qualitatively. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
