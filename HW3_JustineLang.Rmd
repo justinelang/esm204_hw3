@@ -2,11 +2,13 @@
 title: "ESM 204 Homework 3"
 author: "Justine Lang"
 date: "2023-05-18"
-output: html_document
+output: 
+  html_document: 
+    code_folding: hide
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE, echo = TRUE, warning = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 library(tidyverse)
 library(janitor)
@@ -19,7 +21,14 @@ library(pracma)
 ```{r}
 ### Read in data
 
+ev_dat <- read_csv(here("HW3_data.csv")) %>% 
+  clean_names() %>% 
+  rename("price" = "price_dollars",
+         "dac" = "q_dac",
+         "non_dac" = "q_non_dac")
 
+ev_long <- ev_dat %>% 
+  pivot_longer(cols = dac:non_dac, names_to = "community", values_to = "quantity")
 ```
 
 
@@ -30,8 +39,132 @@ of demand per year for both DAC and non-DAC groups. Run linear regressions (with
 intercept) to estimate the demand curves for DAC and non-DAC consumers. What are 2-3
 reasons you can think that may explain the differences in demand you estimate?
 
+```{r}
+### Run linear regressions
+
+dac_lm <- lm(price ~ dac, data = ev_dat)
+dac_coeff <- dac_lm$coefficients
+
+non_dac_lm <- lm(price ~ non_dac, data = ev_dat)
+non_dac_coeff <- non_dac_lm$coefficients
+```
+
+```{r}
+### Write demand functions
+
+### P = a + bQ
+
+dac_demand <- function(Q){
+  P = 116854.84 - 6.61*Q
+  return(P)
+}
+
+nondac_demand <- function(Q){
+  P =  158034.28 - 2.73*Q
+  return(P)
+}
+
+### Q = (P - a)/b
+
+dac_demand_q <- function(P){
+  Q = (116854.84 - P)/6.61
+  return(Q)
+}
+
+nondac_demand_q <- function(P){
+  Q = (158034.28 - P)/2.73
+  return(Q)
+}
+```
+
+**DAC Demand:** $P = 116,854.84 - 6.61*Q$
+
+**Non-DAC Demand:** $P =  158,034.28 - 2.73*Q$
+
+Write 2-3 reasons here.
 
 
+
+## Question 2
+
+One kilogram (kg) of lithium is estimated to cause $300 dollars worth of damage in health costs
+to local communities living near mines. Each EV requires a lithium ion battery containing
+63kg of lithium. Assuming there are no other externalities caused by EV production, what is
+the marginal externality cost per EV produced?
+
+$300/kg * 63kg/EV = 
+$18,900/EV
+
+$MEC = 18,900$
+
+
+## Question 3
+
+What is the aggregate annual demand curve for EVs? What is the supply curve for EVs?
+What is the “benefit” to consumers under the status quo? What is the “benefit” to producers
+under the status quo? What is the environmental cost under the status quo?
+
+```{r}
+### Visualize demand curves
+
+ggplot(data = ev_long, aes(x = quantity, y = price, color = community)) + 
+  geom_point() + 
+  ylim(0, 190000) +
+  xlim(0, 90000) +
+  stat_function(fun = function(Q) dac_demand(Q)) +
+  stat_function(fun = function(Q) nondac_demand(Q)) + 
+  geom_hline(yintercept = 18900) +
+  theme_minimal() 
+```
+
+
+## Question 4
+
+How is the current consumer benefit divided between DAC and non-DAC consumers?
+
+
+## Question 5
+
+Derive the optimal EV tax (in $ per vehicle) to internalize the lithium mining externality.
+Noting that recent research has shown that DACs are far more likely to contain mining activity,
+assume that the mining externality is borne entirely by the DAC group. What would be the
+effects of this tax on:
+(a) The amount of EVs produced and consumed
+(b) The price of EVs
+(c) Overall welfare of non-DAC consumers
+(d) Overall welfare of DAC consumers
+(e) EV producers
+(f) Total environmental damage
+(g) Total tax revenue generated
+
+
+## Question 6
+
+Now, assume that all revenue from the EV tax will be redistributed to the consumers in
+proportion to their pre-tax consumption. For example, if 80% of the EVs were consumed
+by non-DAC consumers, then they get 80% of the tax revenue. Additionally, consider that
+emerging scientific evidence suggests the true environmental damages from lithium mining may
+be much higher than $300. For a range of values of external costs per kg of lithium ($350,
+$400, $450, and $500 per kg), calculate the effects of an EV tax on:1
+(a) Overall welfare of non-DAC consumers
+(b) Overall welfare of DAC consumers
+(c) EV producers
+
+
+## Question 7
+
+Now, consider the fact that the purchase of EVs not only leads to lithium mining, but also helps
+mitigate climate change by replacing gasoline cars. Suppose that climate change damages fall
+mostly outside California, to a lesser extent on DAC consumers, and not at all on non-DAC
+consumers. Qualitatively answer the following (in 1-3 sentences each):
+(a) How does the presence of climate change damages from gasoline cars affect the optimal
+EV tax in California?
+(b) Assuming tax revenue does not get returned to consumers, are non-DAC consumers more
+or less likely to support this new tax, relative to the tax that only accounts for the mining
+externality? Why?
+(c) Assuming tax revenue does not get returned to consumers, are DAC consumers more or
+less likely to support this new tax, relative to the tax that only accounts for the mining
+externality? Why?
 
 
 
