@@ -359,6 +359,189 @@ and $500 per kg), calculate the effects of an EV tax on:
 (b) Overall welfare of DAC consumers
 (c) EV producers
 
+Non-DAC communities consume 86% of EVs. DAC communities consume 14%. 
+
+```{r}
+### Write MEC function
+
+mec_fun <- function(dam) {
+   P = dam * 63
+   return(P)
+}
+
+mec_350 <- mec_fun(350)
+mec_400 <- mec_fun(400)
+mec_450 <- mec_fun(450)
+mec_500 <- mec_fun(500)
+```
+
+```{r}
+### New supply curves
+
+msc2 <- function(dam, Q) {
+  P = mec_fun(dam) + 1.006296*Q
+  return(P)
+}
+```
+
+```{r}
+### Let's try Sandy's method
+
+supply_tax <- function(p, tax) {
+  (p - tax)/1.006296
+}
+
+equi_p <- function(p) {
+  agg_demand(p) - supply_tax(p, mec_fun(300))
+}
+
+p_star1 <- uniroot(equi_p, c(-100000, 100000))$root ### Success
+```
+
+```{r}
+### Pstar 350
+
+equi_p350 <- function(p) {
+  agg_demand(p) - supply_tax(p, mec_fun(350))
+}
+pstar_350 <- uniroot(equi_p350, c(-100000, 100000))$root
+
+### Pstar 400
+
+equi_p400 <- function(p) {
+  agg_demand(p) - supply_tax(p, mec_fun(400))
+}
+pstar_400 <- uniroot(equi_p400, c(-100000, 100000))$root
+
+### Pstar 450
+
+equi_p450 <- function(p) {
+  agg_demand(p) - supply_tax(p, mec_fun(450))
+}
+pstar_450 <- uniroot(equi_p450, c(-100000, 100000))$root
+
+### Pstar 500
+
+equi_p500 <- function(p) {
+  agg_demand(p) - supply_tax(p, mec_fun(500))
+}
+pstar_500 <- uniroot(equi_p500, c(-100000, 100000))$root
+```
+
+```{r}
+### Qstar 350
+
+qstar_350 <- agg_demand(pstar_350)
+
+### Qstar 400
+
+qstar_400 <- agg_demand(pstar_400)
+
+### Qstar 450
+
+qstar_450 <- agg_demand(pstar_450)
+
+### Qstar 500
+
+qstar_500 <- agg_demand(pstar_500)
+```
+
+```{r}
+### Tax revenue
+
+rev_350 <- agg_demand(pstar_350) * mec_350
+rev_400 <- agg_demand(pstar_400) * mec_400
+rev_450 <- agg_demand(pstar_450) * mec_450
+rev_500 <- agg_demand(pstar_500) * mec_500
+
+### Shares
+
+dac_shares <- function(rev) {
+  rev * dac_perc
+}
+
+nondac_shares <- function(rev) {
+  rev * nondac_perc
+}
+
+dac_350 <- dac_shares(rev_350)
+dac_400 <- dac_shares(rev_400)
+dac_450 <- dac_shares(rev_450)
+dac_500 <- dac_shares(rev_500)
+
+nondac_350 <- nondac_shares(rev_350)
+nondac_400 <- nondac_shares(rev_400)
+nondac_450 <- nondac_shares(rev_450)
+nondac_500 <- nondac_shares(rev_500)
+```
+
+
+**(a) Overall welfare of non-DAC consumers**
+
+```{r}
+# cs_fun2(158034.28, pstar_350, nondac_demand_q(pstar_350)) + nondac_350 
+# cs_fun2(158034.28, pstar_400, nondac_demand_q(pstar_400)) + nondac_400
+# cs_fun2(158034.28, pstar_450, nondac_demand_q(pstar_450)) + nondac_450
+# cs_fun2(158034.28, pstar_500, nondac_demand_q(pstar_500)) + nondac_500
+```
+
+350: $2,405,481,004
+
+400: $2,426,706,611
+
+450: $2,443,672,137
+
+500: $2,456,377,581
+
+
+**(b) Overall welfare of DAC consumers**
+
+```{r}
+# cs_fun2(116854.84, pstar_350, dac_demand_q(pstar_350)) + dac_350 - rev_350
+# cs_fun2(116854.84, pstar_400, dac_demand_q(pstar_400)) + dac_400 - rev_400
+# cs_fun2(116854.84, pstar_450, dac_demand_q(pstar_450)) + dac_450 - rev_450
+# cs_fun2(116854.84, pstar_500, dac_demand_q(pstar_500)) + dac_500 - rev_500
+```
+
+If the DAC consumers didn't bear the externality, their surplus would be under each scenario:
+
+350: $334,373,427
+
+400: $332,749,033
+
+450: $330,851,324
+
+500: $328,680,299
+
+But with the environmental damages considered:
+
+350: -$595,760,629
+
+400: -$703,246,072
+
+450: -$804,251,019
+
+500: -$898,775,470
+
+
+**(c) EV producers**
+
+```{r}
+# ps_fun2(pstar_350, agg_demand(pstar_350))
+# ps_fun2(pstar_400, agg_demand(pstar_400))
+# ps_fun2(pstar_450, agg_demand(pstar_450))
+# ps_fun2(pstar_500, agg_demand(pstar_500))
+```
+
+350: $1,360,369,234
+
+400: $1,368,371,753
+
+450: $1,374,153,858
+
+500: $1,377,715,549
+
+
 
 ## Question 7
 
