@@ -150,9 +150,9 @@ cs_fun <- function(a, Q) {
   return(P)
 }
 
-# cs_fun(116854.84, dac_demand_q(50000))
-# cs_fun(158034.28, nondac_demand_q(50000))
-# cs_fun(116854.84, dac_demand_q(50000)) + cs_fun(158034.28, nondac_demand_q(50000))
+dac_cs <- cs_fun(116854.84, dac_demand_q(50000))
+nondac_cs <- cs_fun(158034.28, nondac_demand_q(50000))
+cs <- cs_fun(116854.84, dac_demand_q(50000)) + cs_fun(158034.28, nondac_demand_q(50000))
 
 ### DAC cs: 338091500
 ### Non-DAC cs: 2137620083
@@ -198,8 +198,6 @@ When P ≤ 116,854.84, the aggregate demand curve would be around $P = 145,997.9
 **Supply:** $P = 1.006*Q$
 
 **CS:** $2,475,711,583 
-(DAC: $338,091,500 + 
-Non-DAC: $2,137,620,083)
 
 **PS:** $1,242,179,825
 
@@ -210,6 +208,19 @@ Non-DAC: $2,137,620,083)
 
 How is the current consumer benefit divided between DAC and non-DAC consumers?
 
+**DAC CS:** $338,091,500, or 14% of the consumer benefit. 
+
+**Non-DAC CS:** $2,137,620,083, or 86% of the consumer benefit. 
+
+```{r}
+dac_perc <- dac_cs/cs
+nondac_perc <- nondac_cs/cs
+
+# dac_perc ### 0.1365634
+# nondac_perc ### 0.8634366
+```
+
+
 
 ## Question 5
 
@@ -217,13 +228,120 @@ Derive the optimal EV tax (in $ per vehicle) to internalize the lithium mining e
 Noting that recent research has shown that DACs are far more likely to contain mining activity,
 assume that the mining externality is borne entirely by the DAC group. What would be the
 effects of this tax on:
-(a) The amount of EVs produced and consumed
-(b) The price of EVs
-(c) Overall welfare of non-DAC consumers
-(d) Overall welfare of DAC consumers
-(e) EV producers
-(f) Total environmental damage
-(g) Total tax revenue generated
+
+**(a) The amount of EVs produced and consumed**
+
+```{r}
+### New socially optimal supply curve with MEC
+
+msc <- function(Q) {
+  P = MEC + 1.006296*Q
+  return(P)
+}
+
+msc_q <- function(P) {
+  Q = (P - MEC)/1.006296
+  return(Q)
+}
+```
+
+The optimal tax is the MEC at the socially optimal Q. Since the MEC is constant, the optimal tax is $18,900.
+
+```{r}
+agg_demand_p <- function(Q){
+  P = (75566.5 - Q)/0.5175
+  return(P)
+}
+
+
+F3 <- function(Q){
+  z <- agg_demand_p(Q) - msc(Q)
+  return(z)
+  }
+```
+
+```{r}
+# fzero(F3, c(0,1000))$x
+
+qstar_so <- 43258.5
+
+# agg_demand(50000) 
+```
+
+The socially optimal quantity is around 43,258.5 EVs, which could be rounded down to 43,258. This is less than the previous Qstar of 49,687 EVs. 
+
+
+**(b) The price of EVs**
+
+```{r}
+pstar_so <- msc(qstar_so) ### 62430.86
+```
+
+The socially optimal price is around $62,430.86, 
+which is higher than the previous Pstar of $50,000. 
+
+
+**(c) Overall welfare of non-DAC consumers**
+
+```{r}
+### Writing more general CS and PS functions
+
+cs_fun2 <- function(a, Popt, Q) {
+  P = 1/2*(a - Popt)*Q
+  return(P)
+}
+
+ps_fun2 <- function(Popt, Q) {
+  P = 1/2*Popt*Q
+  return(P)
+}
+```
+
+```{r}
+# cs_fun2(158034.28, pstar_so, nondac_demand_q(pstar_so)) ### 1673995380
+```
+
+Non-DAC CS: $1,673,995,380, 
+which is lower than the previous CS of $2,137,620,083. 
+
+
+**(d) Overall welfare of DAC consumers**
+
+```{r}
+# cs_fun2(116854.84, pstar_so, dac_demand_q(pstar_so)) ### 224052200
+
+# 224052200 - 817484583 ### -593432383
+```
+
+DAC CS: $224,052,200, 
+which is lower than the previous CS of $338,091,500. If you subtract all of the environmental costs
+from that number, the overall welfare is a loss of -$593,432,383. 
+
+
+**(e) EV producers**
+
+```{r}
+# ps_fun2(pstar_so, agg_demand(pstar_so)) ### 1350165658
+```
+
+PS: $1,350,165,658,
+which is higher than the previous PS of $1,242,179,825. 
+
+
+**(f) Total environmental damage**
+
+```{r}
+ec_t <- agg_demand(pstar_so) * MEC ### 817484583
+```
+
+Total environmental damage: $817,484,583, 
+which is lower than the previous $939,087,948
+
+
+**(g) Total tax revenue generated**
+
+Total tax revenue is the same as total environmental damage: $817,484,583. 
+
 
 
 ## Question 6
@@ -232,8 +350,11 @@ Now, assume that all revenue from the EV tax will be redistributed to the consum
 proportion to their pre-tax consumption. For example, if 80% of the EVs were consumed
 by non-DAC consumers, then they get 80% of the tax revenue. Additionally, consider that
 emerging scientific evidence suggests the true environmental damages from lithium mining may
-be much higher than $300. For a range of values of external costs per kg of lithium ($350,
-$400, $450, and $500 per kg), calculate the effects of an EV tax on:1
+be much higher than $300. 
+For a range of values of external costs per kg of lithium ($350,
+$400, 
+$450, 
+and $500 per kg), calculate the effects of an EV tax on:
 (a) Overall welfare of non-DAC consumers
 (b) Overall welfare of DAC consumers
 (c) EV producers
