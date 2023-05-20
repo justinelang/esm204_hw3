@@ -92,10 +92,15 @@ to local communities living near mines. Each EV requires a lithium ion battery c
 63kg of lithium. Assuming there are no other externalities caused by EV production, what is
 the marginal externality cost per EV produced?
 
+```{r}
+MEC <- 18900
+```
+
 $300/kg * 63kg/EV = 
 $18,900/EV
 
 $MEC = 18,900$
+
 
 
 ## Question 3
@@ -105,7 +110,76 @@ What is the “benefit” to consumers under the status quo? What is the “bene
 under the status quo? What is the environmental cost under the status quo?
 
 ```{r}
-### Visualize demand curves
+### Write aggregate demand functions
+
+agg_demand <- function(P) {
+  if (P > 116854.84) {
+  Q = nondac_demand_q(P)
+  }
+  if(P <= 116854.84) {
+   Q = dac_demand_q(P) + nondac_demand_q(P)
+  }
+  return(Q)
+}
+
+simp_agg_demand <- function(P) {
+  Q = dac_demand_q(P) + nondac_demand_q(P)
+  return(Q)
+}
+```
+
+```{r}
+### Supply = 0 + mQ
+### EV price without intervention is $50,000 per EV
+
+# agg_demand(50000) ### Q = 49687.19
+
+# 50000/agg_demand(50000) ### 1.006296
+
+supply <- function(Q) {
+  P = 0 + 1.006296*Q
+  return(P)
+}
+```
+
+```{r}
+### Surplus
+
+cs_fun <- function(a, Q) {
+  P = 1/2*(a - 50000)*Q
+  return(P)
+}
+
+# cs_fun(116854.84, dac_demand_q(50000))
+# cs_fun(158034.28, nondac_demand_q(50000))
+# cs_fun(116854.84, dac_demand_q(50000)) + cs_fun(158034.28, nondac_demand_q(50000))
+
+### DAC cs: 338091500
+### Non-DAC cs: 2137620083
+### total cs: 2475711583
+
+ps_fun <- function(Q) {
+  P = 1/2*50000*Q
+  return(P)
+}
+
+# ps_fun(agg_demand(50000)) ### 1242179825
+```
+
+```{r}
+### EC = Qagg * MEC
+
+### Should have done this sooner
+pstar <- 50000
+qstar <- agg_demand(50000)
+
+ec <- qstar*MEC
+# ec ### 939087948
+```
+
+
+```{r}
+### Visualize demand curves - tidy up graph
 
 ggplot(data = ev_long, aes(x = quantity, y = price, color = community)) + 
   geom_point() + 
@@ -113,9 +187,23 @@ ggplot(data = ev_long, aes(x = quantity, y = price, color = community)) +
   xlim(0, 90000) +
   stat_function(fun = function(Q) dac_demand(Q)) +
   stat_function(fun = function(Q) nondac_demand(Q)) + 
+  stat_function(fun = function(Q) supply(Q)) +
   geom_hline(yintercept = 18900) +
   theme_minimal() 
 ```
+
+**Aggregate Demand:** When P > 116,854.84, the aggregate demand curve is $P =  158,034.28 - 2.73*Q$.
+When P ≤ 116,854.84, the aggregate demand curve would be around $P = 145,997.96 - Q/0.5175$.
+
+**Supply:** $P = 1.006*Q$
+
+**CS:** $2,475,711,583 
+(DAC: $338,091,500 + 
+Non-DAC: $2,137,620,083)
+
+**PS:** $1,242,179,825
+
+**EC:** $939,087,948
 
 
 ## Question 4
