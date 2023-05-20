@@ -81,7 +81,7 @@ nondac_demand_q <- function(P){
 
 **Non-DAC Demand:** $P =  158,034.28 - 2.73*Q$
 
-Write 2-3 reasons here.
+Non-DAC communities have higher demand for EVs than DAC communities. This may be because non-DAC communities have higher income and might also have infrastructure that is better developed to support EV charging stations, two reasons that could contribute to that higher demand.
 
 
 
@@ -93,11 +93,8 @@ to local communities living near mines. Each EV requires a lithium ion battery c
 the marginal externality cost per EV produced?
 
 ```{r}
-MEC <- 18900
+MEC <- 300 * 63
 ```
-
-$300/kg * 63kg/EV = 
-$18,900/EV
 
 $MEC = 18,900$
 
@@ -110,7 +107,7 @@ What is the “benefit” to consumers under the status quo? What is the “bene
 under the status quo? What is the environmental cost under the status quo?
 
 ```{r}
-### Write aggregate demand functions
+### Write aggregate demand function
 
 agg_demand <- function(P) {
   if (P > 116854.84) {
@@ -119,11 +116,6 @@ agg_demand <- function(P) {
   if(P <= 116854.84) {
    Q = dac_demand_q(P) + nondac_demand_q(P)
   }
-  return(Q)
-}
-
-simp_agg_demand <- function(P) {
-  Q = dac_demand_q(P) + nondac_demand_q(P)
   return(Q)
 }
 ```
@@ -178,8 +170,8 @@ ec <- qstar*MEC
 ```
 
 
-```{r}
-### Visualize demand curves - tidy up graph
+```{r fig 1, fig.align='center', fig.cap="Figure 1: EV market supply and demand curves at the status quo for DAC and non-DAC communities. The horizontal black line is the MEC."}
+### Visualize demand curves
 
 ggplot(data = ev_long, aes(x = quantity, y = price, color = community)) + 
   geom_point() + 
@@ -188,8 +180,9 @@ ggplot(data = ev_long, aes(x = quantity, y = price, color = community)) +
   stat_function(fun = function(Q) dac_demand(Q)) +
   stat_function(fun = function(Q) nondac_demand(Q)) + 
   stat_function(fun = function(Q) supply(Q)) +
+  scale_color_manual(values = c('red', 'navy')) +
   geom_hline(yintercept = 18900) +
-  theme_minimal() 
+  theme_minimal()
 ```
 
 **Aggregate Demand:** When P > 116,854.84, the aggregate demand curve is $P =  158,034.28 - 2.73*Q$.
@@ -197,11 +190,11 @@ When P ≤ 116,854.84, the aggregate demand curve would be around $P = 145,997.9
 
 **Supply:** $P = 1.006*Q$
 
-**CS:** $2,475,711,583 
+**Consumer Surplus:** $2,475,711,583 
 
-**PS:** $1,242,179,825
+**Producer Surplus:** $1,242,179,825
 
-**EC:** $939,087,948
+**Environmental Cost:** $939,087,948
 
 
 ## Question 4
@@ -213,6 +206,8 @@ How is the current consumer benefit divided between DAC and non-DAC consumers?
 **Non-DAC CS:** $2,137,620,083, or 86% of the consumer benefit. 
 
 ```{r}
+### Percentages
+
 dac_perc <- dac_cs/cs
 nondac_perc <- nondac_cs/cs
 
@@ -549,52 +544,22 @@ Now, consider the fact that the purchase of EVs not only leads to lithium mining
 mitigate climate change by replacing gasoline cars. Suppose that climate change damages fall
 mostly outside California, to a lesser extent on DAC consumers, and not at all on non-DAC
 consumers. Qualitatively answer the following (in 1-3 sentences each):
-(a) How does the presence of climate change damages from gasoline cars affect the optimal
-EV tax in California?
-(b) Assuming tax revenue does not get returned to consumers, are non-DAC consumers more
-or less likely to support this new tax, relative to the tax that only accounts for the mining
-externality? Why?
-(c) Assuming tax revenue does not get returned to consumers, are DAC consumers more or
-less likely to support this new tax, relative to the tax that only accounts for the mining
-externality? Why?
+
+**(a) How does the presence of climate change damages from gasoline cars affect the optimal EV tax in California?**
+
+Since climate change damages at least partially fall on DAC consumers, they could lower the optimal EV tax slightly, since there would be a social benefit from purchasing EVs instead of gasoline cars, offsetting some of the impacts of climate change. 
 
 
+**(b) Assuming tax revenue does not get returned to consumers, are non-DAC consumers more or less likely to support this new tax, relative to the tax that only accounts for the mining externality? Why?**
+
+If the EV tax is lowered, non-DAC consumers would be likely to support it since they have the higher demand for EVs and do not suffer any damage from the mining externality or climate change in this scenario. 
 
 
+**(c) Assuming tax revenue does not get returned to consumers, are DAC consumers more or less likely to support this new tax, relative to the tax that only accounts for the mining externality? Why?**
+
+DAC consumers are less likely to support this new tax, especially if tax revenue does not get returned to consumers. They experience far more harm from lithium mining and climate change than non-DAC consumers despite having lower demand for EVs. They don't really benefit from this tax. 
 
 
-
-### Notes
-
-Slope = 50,000/Q_agg(50,000)
-
-P = 0 + 50,000/Q_agg(50,000)
-
-Don't worry about the kink in the agg curve. Just use triangle formula. Write function. Use demand function to calculate base of the triangle. 
-
-Producer surplus simpler. 
-
-Total environmental damage = externality per car x total cars. 
-
-EV tax: the MEC at Qso; in this case, tax just equals MEC
-
-Equate new supply curve (MSC) to aggregate demand curve. P = mQ + t; Q = P-t/m -> supply(p,t); Q should = Qagg. Use uniroot to find Pt*. Plug Pstar back into equation to find Qstar. 
-
-Would work to find Pstar or Qstar first, but might be best to find Pstar first. 
-
-Assume the mining externality is borne entirely by the DAC group. 
-
-Health cost = Qagg(Pt) x MEC
-
-The results should indicate that the tax doesn't do much for the disadvantaged group. 
-
-See tax on sellers graph. 
-
-stargazer
-
-Tax revenue = Qstar x t(MEC); calculate the redistribution four different times.
-
-Just answer question 7 qualitatively. 
 
 
 
